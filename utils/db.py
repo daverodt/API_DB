@@ -1,6 +1,6 @@
 from databases import Database
 from const import DB_URL
-import asyncio
+from orm_db import authors
 
 async def connect_db():
 	db = Database(DB_URL)
@@ -39,4 +39,13 @@ async def fetch(query, is_one, values=None):
 
 	return out
 
-print("Que bonito!")
+
+import asyncio
+async def test_orm():
+	query = authors.select().where(authors.c.id==2)
+	out = await fetch(query, True)
+	print(out)
+
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(test_orm())
