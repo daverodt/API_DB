@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from utils.const import JWT_EXPIRATION_TIME_MINUTES, JWT_SECRET_KEY, JWT_ALGORITHM
 from passlib.context import CryptContext
 import jwt
-from fastapi import Depends,HTTPException
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import time
 from starlette.status import HTTP_401_UNAUTHORIZED
@@ -13,10 +13,8 @@ from jwt_user import JWTUser
 
 oauth_schema = OAuth2PasswordBearer(tokenUrl="/token")
 pwd_context = CryptContext(schemes=["bcrypt"])
-jwt_user1 = {"username":"user1",
-			"password":"$2b$12$kf29d.uVA7CuA9Mbgs4b1uQtlXgC/mjo5N26sGXz6nyauV437Hd0e",
-			"disabled":False,"role":"admin"}
-fake_jwt_user1 = JWTUser(**jwt_user1)
+
+
 
 def get_hashed_password(password):
 	return pwd_context.hash(password)
@@ -31,6 +29,9 @@ def verify_password(plain_password, hashed_password):
 
 # Authenticate username and password to give JWT token
 def authenticate_user(user: JWTUser):
+	hashed_password = get_hashed_password(user.password)
+	user.password = hashed_password
+	
 	if fake_jwt_user1.username == user.username:
 		if verify_password(user.password, fake_jwt_user1.password):
 			user.role = "admin"
